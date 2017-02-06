@@ -43,7 +43,7 @@ PORTAL_DOMAIN=$(echo $DIT4C_INSTANCE_URI_UPDATE_URL | awk -F/ '{print $3}')
 
 while true
 do
-  SSH_SERVER=$(dig +short TXT $PORTAL_DOMAIN | grep -Eo "dit4c-ssh-router=[^\"]*" | cut -d= -f2 | xargs /opt/bin/sort_by_latency.sh | head -1)
+  SSH_SERVER=$(dig +short TXT $PORTAL_DOMAIN | grep -Eo "dit4c-router-ssh=[^\"]*" | cut -d= -f2 | xargs /opt/bin/sort_by_latency.sh | head -1)
   SSH_HOST=$(echo $SSH_SERVER | cut -d: -f1)
   SSH_PORT=$(echo $SSH_SERVER | cut -d: -f2)
 
