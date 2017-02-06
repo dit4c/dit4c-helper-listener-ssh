@@ -9,6 +9,11 @@ if [[ -f /dit4c/env.sh ]]; then
   set +a
 fi
 
+if [[ "$DIT4C_INSTANCE_ID" == "" ]]; then
+  echo "Must specify DIT4C_INSTANCE_ID to provide to routing server"
+  exit 1
+fi
+
 if [[ "$DIT4C_INSTANCE_HELPER_AUTH_HOST" == "" ]]; then
   echo "Must specify DIT4C_INSTANCE_HELPER_AUTH_HOST to expose"
   exit 1
@@ -41,21 +46,31 @@ fi
 
 PORTAL_DOMAIN=$(echo $DIT4C_INSTANCE_URI_UPDATE_URL | awk -F/ '{print $3}')
 
+umask 0077
 while true
 do
   SSH_SERVER=$(dig +short TXT $PORTAL_DOMAIN | grep -Eo "dit4c-router-ssh=[^\"]*" | cut -d= -f2 | xargs /opt/bin/sort_by_latency.sh | head -1)
   SSH_HOST=$(echo $SSH_SERVER | cut -d: -f1)
   SSH_PORT=$(echo $SSH_SERVER | cut -d: -f2)
 
-  ssh -i $DIT4C_INSTANCE_PRIVATE_KEY_PKCS1 \
+  if [[ "$SSH_SERVER" == "" ]]; then
+    echo "Unable to resolve routing server"
+    sleep 60
+    continue
+  fi
+
+  TMP_KEY=$(mktemp)
+  cat $DIT4C_INSTANCE_PRIVATE_KEY_PKCS1 > $TMP_KEY
+
+  ssh -i $TMP_KEY \
     -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" \
     -p $SSH_PORT \
-    register@$SSH_HOST $DIT4C_INSTANCE_JWT_KID
+    register@$SSH_HOST $DIT4C_INSTANCE_ID
 
   RANDOM_SUFFIX=$(tr -dc '[:alnum:]' < /dev/urandom | head -c32)
   SOCKET="/tmp/$DIT4C_INSTANCE_JWT_KID-$RANDOM_SUFFIX.sock"
 
-  ssh -i $DIT4C_INSTANCE_PRIVATE_KEY_PKCS1 \
+  ssh -i $TMP_KEY \
     -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" \
     -R $SOCKET:$DIT4C_INSTANCE_HELPER_AUTH_HOST:$DIT4C_INSTANCE_HELPER_AUTH_PORT \
     -p $SSH_PORT \

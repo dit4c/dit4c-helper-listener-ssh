@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -x
+
 SCRIPT_DIR=$(dirname $0)
 
 calculate_latency () {

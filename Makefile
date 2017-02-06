@@ -44,9 +44,10 @@ ${DOCKER2ACI}: | ${BUILD_DIR}
 ${ALPINE_ACI}: ${DOCKER2ACI}
 	cd ${BUILD_DIR} && ../${DOCKER2ACI} docker://${ALPINE_DOCKER_IMAGE}
 
-${TARGET_IMAGE}: ${ACBUILD} ${ALPINE_ACI} ${BIN_FILES} | ${OUT_DIR}
+${TARGET_IMAGE}: ${ACBUILD} ${ALPINE_ACI} ${BUILD_DIR}/jwt ${BIN_FILES} | ${OUT_DIR}
 	sudo rm -rf .acbuild
 	sudo ${ACBUILD} --debug begin ${ALPINE_ACI}
+	sudo ${ACBUILD} --debug copy build/jwt /usr/bin/jwt
 	sudo ${ACBUILD} --debug copy-to-dir install.sh /
 	sudo ${ACBUILD} --debug copy-to-dir bin /opt
 	sudo sh -c 'PATH=${shell echo $$PATH}:${BUILD_DIR} ${ACBUILD} --debug run --engine chroot -- sh -c "./install.sh && rm -f install.sh"'
@@ -71,7 +72,7 @@ ${TARGET_IMAGE}.asc: ${TARGET_IMAGE} signing.key
 	$(GPG) $(GPG_FLAGS) --armour --detach-sign $<
 	rm $(TMP_PUBLIC_KEYRING) $(TMP_SECRET_KEYRING)
 
-build/jwt: | ${RKT}
+${BUILD_DIR}/jwt: | ${RKT}
 	$(eval RKT_TMPDIR := $(shell mktemp -d -p ./build))
 	sudo -v && sudo $(RKT) --dir=$(RKT_TMPDIR) run \
 		--dns=8.8.8.8 --insecure-options=image \
