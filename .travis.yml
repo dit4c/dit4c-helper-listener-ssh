@@ -1,0 +1,18 @@
+sudo: required
+dist: trusty
+language: generic
+script: make && make test
+before_deploy:
+- openssl aes-256-cbc -K $encrypted_7e78842bbac1_key -iv $encrypted_7e78842bbac1_iv -in signing.key.enc -out signing.key -d
+- make deploy
+deploy:
+  provider: releases
+  api_key:
+    secure: h7M8SV+6l/bIm2ChH0GaReAFQb6WP+401vXcIe9NSZzt2KzCwcxYzFiF6mzjp2dedKBT/sZ79kMbIw9QHHPDt6dpQAPjxXMmI5qeigag7hOjHs7s4TA+3a8ZcTjv06pGLi+bVOZITr+M0zGItxoC4MGKJ9LSBCzlVrHuFolhuvjZ0AQ5t4c5dhxJVrlxsyr3XzlkUmgjQxltz83YXpEipYRWHjYVAtx4mGMKv0EMlicKtBOXxoSvpAJ0K3ow7WxJrt/e6vBBZ+EM5wu/S60XZEsurR0zW+eP32k9kOYoJeH6REePPz0IHWb+x7IXtIr+xUgO5VZx5zluXDNUhmdiR18Wi8V1NdOukPruRG7pHOOlyZp0mvcaYYkp+r/OMpeuz1pJbtMNxJj3LKamIvRykRzCuIHk8OorTzG+DLDxxqE5dfNcDFBQYS9hCDffOA3DJA0FfO41V0p6sL3X25iZCznOmd7//pciVCNqxiNAW/Yoh8U8NbG8muetCa2BRppGZYWx7CSN7BsDMgmTu/LxY4XGunQ/1EpayhHhABcogPVG/KHhI2bIpt4xSCPqtjrDVp3+0RZI5MfKgwSaCtQ/LXRhwaA3BbhGBdHlMy3cM4kwrO3EsNPT7efN7718gXaoZUnnR8a2GV94JVn92NOLIZ5EeeWC8rTCoGoVuWi9sNk=
+  file:
+    - dist/dit4c-helper-listener-ssh.linux.amd64.aci
+    - dist/dit4c-helper-listener-ssh.linux.amd64.aci.asc
+  skip_cleanup: true
+  on:
+    tags: true
+    repo: dit4c/dit4c-helper-listener-ssh
