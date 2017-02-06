@@ -72,6 +72,7 @@ do
 
   ssh -i $TMP_KEY \
     -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" \
+    -o "ServerAliveInterval 30" \
     -R $SOCKET:$DIT4C_INSTANCE_HELPER_AUTH_HOST:$DIT4C_INSTANCE_HELPER_AUTH_PORT \
     -p $SSH_PORT \
     listen@$SSH_HOST $SOCKET | \
