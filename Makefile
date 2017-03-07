@@ -21,7 +21,7 @@ DOCKER2ACI=${BUILD_DIR}/docker2aci
 DOCKER2ACI_VERSION=0.15.0
 DOCKER2ACI_URL=https://github.com/appc/docker2aci/releases/download/v${DOCKER2ACI_VERSION}/docker2aci-v${DOCKER2ACI_VERSION}.tar.gz
 
-RKT_VERSION=1.23.0
+RKT_VERSION=1.25.0
 ACBUILD=build/acbuild
 RKT=build/rkt/rkt
 BIN_FILES=$(shell find ${BASE_DIR}/bin)

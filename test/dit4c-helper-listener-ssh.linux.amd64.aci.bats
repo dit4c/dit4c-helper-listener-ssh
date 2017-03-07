@@ -18,6 +18,14 @@ teardown() {
   [ $(expr "${output}" : ".*Protocols: .*https.*") -ne 0 ]
 }
 
+@test "jq binary runs" {
+  run sudo $RKT run --insecure-options=image --stage1-path=$RKT_STAGE1 \
+    $IMAGE \
+    --exec /usr/bin/jq -- -V
+  echo $output
+  [ "$status" -eq 0 ]
+}
+
 @test "jwt binary runs" {
   run sudo $RKT run --insecure-options=image --stage1-path=$RKT_STAGE1 \
     $IMAGE \
